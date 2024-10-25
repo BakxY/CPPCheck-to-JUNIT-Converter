@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-    :brief RATS to JUNIT Converter
+    :brief CPPCheck to JUNIT Converter
     :date 24.10.2024
     :version v1.0.0
     :author Severin Sprenger
@@ -23,9 +23,10 @@ def list_files_recursive(path='.'):
             list_files_recursive(full_path)
         else:
             if full_path.endswith((".c", ".cpp", ".h", ".ino")): # Add custom file types here
-            	scannedFiles.append(full_path.replace("./", "", 1))
+            	scannedFiles.append(full_path.replace(sys.argv[2], "", 1))
 
 list_files_recursive(sys.argv[2])
+
 
 # Build JUnit XML
 cppcheck_output = ET.parse(sys.argv[1])
@@ -51,4 +52,33 @@ for files in scannedFiles:
 
     for errors in cppcheck_output_root.findall("errors/error"):
         if errors.find("location") != None and str(errors.find("location").attrib["file"]) == str(files):
-            print("lol")
+            errorElement = ET.SubElement(testcase, "error")
+
+            volnMessage = str(errors.attrib["msg"])
+
+            volnType = "Unknown"
+            volnSeverity = "Unknown"
+
+            if(errors.attrib["id"] != None):
+                volnType = str(errors.attrib["id"])
+
+            if(errors.attrib["severity"] != None):
+                volnSeverity = str(errors.attrib["severity"])
+
+            errorElement.text = ""
+            errorElement.text += "Type: " + volnType + "\n"
+            errorElement.text += "Severity: " + volnSeverity + "\n\n"
+            errorElement.text += "Security Alert:\n" + volnMessage + "\n\n"
+            errorElement.text += "Location: At line " + str(errors.find("location").attrib["line"] + "\n")
+
+            errorCount += 1
+
+testsuites.attrib["errors"] = str(errorCount)
+
+tree = ET.ElementTree(root)
+try:
+    os.remove(sys.argv[3])
+except OSError:
+    pass
+tree.write(sys.argv[3])
+
