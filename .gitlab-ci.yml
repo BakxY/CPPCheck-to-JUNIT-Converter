@@ -1,0 +1,9 @@
+image: ubuntu:latest
+
+stages:
+  - deploy
+
+Rebuild downstream:
+  stage: deploy
+  trigger:
+    project: BakxY/ubuntucppcheck
