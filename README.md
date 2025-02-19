@@ -1,6 +1,6 @@
 # RATS to JUNIT Converter
 
-This python scrypt converts a XML output of a [CPPCheck](http://cppcheck.net/) command to a JUNIT XML format to be used with a CICD like in Gitlab. 
+This python script converts a XML output of a [CPPCheck](http://cppcheck.net/) command to a JUNIT XML format to be used with a CICD like in Gitlab. 
 
 ## Arguments
 
